@@ -47,7 +47,7 @@ export const callAI = async (userQuery, systemInstruction) => {
             'Authorization': `Bearer ${settings.key}`
           },
           body: JSON.stringify({
-            model: settings.model || 'gpt-4-turbo',
+            model: settings.model || 'gpt-4o',
             messages: [
               { role: 'system', content: systemInstruction },
               { role: 'user', content: userQuery }
@@ -72,7 +72,7 @@ export const callAI = async (userQuery, systemInstruction) => {
             'dangerously-allow-browser-only': 'true'
           },
           body: JSON.stringify({
-            model: settings.model || 'claude-3-5-sonnet-20240620',
+            model: settings.model || 'claude-3-5-sonnet-20241022',
             system: systemInstruction,
             messages: [{ role: 'user', content: userQuery }],
             max_tokens: 1024

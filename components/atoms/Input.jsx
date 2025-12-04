@@ -66,17 +66,27 @@ export const Select = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'w-full p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm';
+  const baseClasses = 'w-full p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm text-gray-900 dark:text-gray-100';
 
   return (
     <select
       value={value}
       onChange={onChange}
       className={`${baseClasses} ${className}`}
+      style={{
+        colorScheme: 'dark'
+      }}
       {...props}
     >
       {options.map((opt, idx) => (
-        <option key={idx} value={typeof opt === 'string' ? opt : opt.value}>
+        <option
+          key={idx}
+          value={typeof opt === 'string' ? opt : opt.value}
+          style={{
+            backgroundColor: 'rgb(31, 41, 55)',
+            color: 'rgb(243, 244, 246)'
+          }}
+        >
           {typeof opt === 'string' ? opt : opt.label}
         </option>
       ))}
