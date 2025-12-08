@@ -69,10 +69,9 @@ export const callAI = async (userQuery, systemInstruction) => {
             'x-api-key': settings.key,
             'anthropic-version': '2023-06-01',
             'content-type': 'application/json',
-            'dangerously-allow-browser-only': 'true'
           },
           body: JSON.stringify({
-            model: settings.model || 'claude-3-5-sonnet-20241022',
+            model: settings.model || 'claude-sonnet-4-20250514',
             system: systemInstruction,
             messages: [{ role: 'user', content: userQuery }],
             max_tokens: 1024
