@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePlatform } from './usePlatform.js';
+import { invoke } from '../utils/tauri.js';
 
 /**
  * Hook for managing workflows in desktop mode
@@ -19,7 +20,6 @@ export function useWorkflows() {
     setError(null);
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const data = await invoke('list_workflows');
       setWorkflows(data);
     } catch (err) {
@@ -35,7 +35,6 @@ export function useWorkflows() {
     if (!isDesktop) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const workflow = await invoke('create_workflow', {
         input: { name, type, data }
       });
@@ -53,7 +52,6 @@ export function useWorkflows() {
     if (!isDesktop) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const workflow = await invoke('get_workflow', { id });
       return workflow;
     } catch (err) {
@@ -68,7 +66,6 @@ export function useWorkflows() {
     if (!isDesktop) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const workflow = await invoke('update_workflow', {
         id,
         input: updates
@@ -89,7 +86,6 @@ export function useWorkflows() {
     if (!isDesktop) return false;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       await invoke('delete_workflow', { id });
       setWorkflows(prev => prev.filter(w => w.id !== id));
       return true;

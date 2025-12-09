@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePlatform } from './usePlatform.js';
+import { invoke } from '../utils/tauri.js';
 
 /**
  * Hook for managing generation jobs
@@ -19,7 +20,6 @@ export function useJobs(workflowId) {
     setError(null);
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const data = await invoke('list_jobs', { workflowId });
       setJobs(data);
     } catch (err) {
@@ -35,7 +35,6 @@ export function useJobs(workflowId) {
     if (!isDesktop || !workflowId) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const job = await invoke('create_job', {
         input: {
           workflowId,
@@ -58,7 +57,6 @@ export function useJobs(workflowId) {
     if (!isDesktop) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const job = await invoke('get_job', { id });
       return job;
     } catch (err) {
@@ -73,7 +71,6 @@ export function useJobs(workflowId) {
     if (!isDesktop) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const job = await invoke('update_job', {
         id,
         input: updates

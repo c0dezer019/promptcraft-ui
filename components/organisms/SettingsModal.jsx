@@ -3,6 +3,8 @@ import { X, Settings, Globe, Shield, Server, Sparkles, Image, Video } from 'luci
 import { Button } from '../atoms';
 import { loadAISettings, saveAISettings } from '../../utils/aiApi';
 import { usePlatform } from '../../hooks/usePlatform.js';
+import { getItem, setItem } from '../../utils/storage.js';
+import { invoke } from '../../utils/tauri.js';
 
 /**
  * SettingsModal Component - AI Provider Configuration
@@ -29,43 +31,45 @@ export const SettingsModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      // Load enhancement settings
-      const settings = loadAISettings();
-      setProvider(settings.provider || 'gemini');
-      setKey(settings.key || '');
-      setModel(settings.model || '');
-      setBaseUrl(settings.baseUrl || '');
+      // Load settings asynchronously
+      (async () => {
+        // Load enhancement settings
+        const settings = await loadAISettings();
+        setProvider(settings.provider || 'gemini');
+        setKey(settings.key || '');
+        setModel(settings.model || '');
+        setBaseUrl(settings.baseUrl || '');
 
-      // Load generation settings
-      const genSettings = JSON.parse(localStorage.getItem('generation_providers') || '{}');
-      setGenProviders({
-        openai: genSettings.openai || { enabled: false, apiKey: '' },
-        google: genSettings.google || { enabled: false, apiKey: '' },
-        midjourney: genSettings.midjourney || { enabled: false, apiKey: '' },
-        grok: genSettings.grok || { enabled: false, apiKey: '' }
-      });
+        // Load generation settings
+        const genSettings = await getItem('generation_providers', {});
+        setGenProviders({
+          openai: genSettings.openai || { enabled: false, apiKey: '' },
+          google: genSettings.google || { enabled: false, apiKey: '' },
+          midjourney: genSettings.midjourney || { enabled: false, apiKey: '' },
+          grok: genSettings.grok || { enabled: false, apiKey: '' }
+        });
 
-      // Set tab based on desktop mode
-      if (isDesktop) {
-        setActiveTab('generation');
-      }
+        // Set tab based on desktop mode
+        if (isDesktop) {
+          setActiveTab('generation');
+        }
+      })();
     }
   }, [isOpen, isDesktop]);
 
-  const handleSave = () => {
-    saveAISettings({ provider, key, model, baseUrl });
+  const handleSave = async () => {
+    await saveAISettings({ provider, key, model, baseUrl });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   const handleGenSave = async () => {
-    // Save to localStorage
-    localStorage.setItem('generation_providers', JSON.stringify(genProviders));
+    // Save to storage (works for both web and desktop)
+    await setItem('generation_providers', genProviders);
 
     // If in desktop mode, send to Tauri backend
-    if (isDesktop && window.__TAURI__) {
+    if (isDesktop) {
       try {
-        const { invoke } = window.__TAURI__.core;
         // Configure each enabled provider
         for (const [providerName, config] of Object.entries(genProviders)) {
           if (config.enabled && config.apiKey) {

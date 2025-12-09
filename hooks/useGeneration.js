@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { usePlatform } from './usePlatform.js';
 import { useJobs } from './useJobs.js';
+import { invoke } from '../utils/tauri.js';
 
 /**
  * Hook for AI generation across different providers
@@ -40,7 +41,6 @@ export function useGeneration(workflowId) {
 
     try {
       console.log('[useGeneration] Submitting generation to Tauri...');
-      const { invoke } = window.__TAURI__.core;
       const job = await invoke('submit_generation', {
         workflowId,
         provider,

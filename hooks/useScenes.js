@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePlatform } from './usePlatform.js';
+import { invoke } from '../utils/tauri.js';
 
 /**
  * Hook for managing scenes (workflow snapshots)
@@ -19,7 +20,6 @@ export function useScenes(workflowId) {
     setError(null);
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const data = await invoke('list_scenes', { workflowId });
       setScenes(data);
     } catch (err) {
@@ -35,7 +35,6 @@ export function useScenes(workflowId) {
     if (!isDesktop || !workflowId) return null;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const scene = await invoke('create_scene', {
         input: {
           workflowId,
@@ -58,7 +57,6 @@ export function useScenes(workflowId) {
     if (!isDesktop) return false;
 
     try {
-      const { invoke } = window.__TAURI__.core;
       await invoke('delete_scene', { id });
       setScenes(prev => prev.filter(s => s.id !== id));
       return true;

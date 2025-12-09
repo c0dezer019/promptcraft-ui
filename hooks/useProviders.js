@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePlatform } from './usePlatform.js';
+import { invoke } from '../utils/tauri.js';
 
 /**
  * Hook for managing AI generation providers
@@ -21,7 +22,6 @@ export function useProviders() {
     setError(null);
 
     try {
-      const { invoke } = window.__TAURI__.core;
       const providerList = await invoke('list_providers');
       setProviders(providerList);
     } catch (err) {

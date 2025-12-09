@@ -1,3 +1,5 @@
+import { getItem, setItem } from './storage.js';
+
 /**
  * AI API Helper - Supports multiple providers
  * @param {string} userQuery - The user's prompt/query
@@ -6,12 +8,11 @@
  */
 export const callAI = async (userQuery, systemInstruction) => {
   // 1. Load Settings
-  const settingsStr = localStorage.getItem('promptcraft_ai_settings');
-  let settings = settingsStr ? JSON.parse(settingsStr) : { provider: 'gemini', key: '', model: '', baseUrl: '' };
+  let settings = await getItem('promptcraft_ai_settings', { provider: 'gemini', key: '', model: '', baseUrl: '' });
 
   // Fallback for legacy key if no new settings
   if (!settings.key) {
-    const legacyKey = localStorage.getItem('promptcraft_gemini_key');
+    const legacyKey = await getItem('promptcraft_gemini_key', null);
     if (legacyKey) settings = { provider: 'gemini', key: legacyKey, model: '', baseUrl: '' };
   }
 
@@ -98,16 +99,16 @@ export const callAI = async (userQuery, systemInstruction) => {
 };
 
 /**
- * Load AI settings from localStorage
- * @returns {object} Settings object
+ * Load AI settings from storage
+ * @returns {Promise<object>} Settings object
  */
-export const loadAISettings = () => {
-  const stored = localStorage.getItem('promptcraft_ai_settings');
+export const loadAISettings = async () => {
+  const stored = await getItem('promptcraft_ai_settings', null);
   if (stored) {
-    return JSON.parse(stored);
+    return stored;
   }
   // Check for legacy key
-  const legacy = localStorage.getItem('promptcraft_gemini_key');
+  const legacy = await getItem('promptcraft_gemini_key', null);
   if (legacy) {
     return { provider: 'gemini', key: legacy, model: '', baseUrl: '' };
   }
@@ -115,9 +116,10 @@ export const loadAISettings = () => {
 };
 
 /**
- * Save AI settings to localStorage
+ * Save AI settings to storage
  * @param {object} settings - Settings object
+ * @returns {Promise<void>}
  */
-export const saveAISettings = (settings) => {
-  localStorage.setItem('promptcraft_ai_settings', JSON.stringify(settings));
+export const saveAISettings = async (settings) => {
+  await setItem('promptcraft_ai_settings', settings);
 };
